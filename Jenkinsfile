@@ -12,7 +12,7 @@ pipeline {
                 echo 'Building...'
                 
 		sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} ."
-		sh "docker tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion() \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
+		sh "docker tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
             }
         }
         stage('Test') {
