@@ -32,8 +32,12 @@ pipeline {
             }
         }
         stage('Clean') {
+	    steps {
+		echo 'Cleaning...'
+
 		sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
 		sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
+	    }
 	}
     }
 }
