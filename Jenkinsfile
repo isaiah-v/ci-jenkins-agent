@@ -52,8 +52,8 @@ pipeline {
             steps {
                 echo 'Building...'
                 
-                sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} ."
-                sh "docker tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
+                sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()} ."
+                sh "docker tag \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-latest"
             }
         }
         
@@ -67,8 +67,8 @@ pipeline {
             steps {
                 echo 'Deploying...'
                 
-                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
-                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
+                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
+                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-latest"
             }
         }
         stage('Clean aarch64') {
@@ -78,13 +78,13 @@ pipeline {
             steps {
                 echo 'Cleaning...'
 
-                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
-                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
+                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
+                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-latest"
             }
         }
     }
 }
 
 def getVersion() {
-    return "${env.TAG_NAME ? env.TAG_NAME : 'SNAPSHOT.' + env.BUILD_NUMBER}";
+    return "${env.TAG_NAME ? env.TAG_NAME.substring(1) : 'SNAPSHOT.' + env.BUILD_NUMBER}";
 }
