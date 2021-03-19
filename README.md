@@ -7,37 +7,27 @@ A jenkins agent setup to connect directly to our Jenkins instance. This setup is
 
 `INSTANCE_IDENTITY` - Each Jenkins instance has its own [Instance Identity](https://wiki.jenkins.io/display/JENKINS/Instance+Identity). The agent needs this key to complete the connection. You can obtain this value via the script console or the Instance Identity page.
  
- `SECRET` - Your secret key defined in your agent status.
+`SECRET` - Your secret key defined in your agent status.
  
- `AGENT` - You must provide the agent name. This is easily obtained from the agent status page or other places.
+`AGENT` - You must provide the agent name. This is easily obtained from the agent status page or other places.
  
- ## Build
- ```
- git clone https://github.com/isaiah-v/ci-jenkins-agent.git
- cd ci-jenkins-agent
- sudo docker build --tag ci-jenkins-agent:latest .
- ```
+## Build
+```
+git clone https://github.com/isaiah-v/ci-jenkins-agent.git
+cd ci-jenkins-agent
+sudo docker build --tag ci-jenkins-agent:latest .
+```
  
- ## Run
- Basic:
+## Run
  
- ```
- sudo docker run -d --restart=always --name ci-jenkins-agent \
-       -e DIRECT=$DIRECT \
-       -e INSTANCE_IDENTITY=$INSTANCE_IDENTITY \
-       -e SECRET=$SECRET \
-       -e AGENT=$AGENT \
-       ci-jenkins-agent:latest
+In these examples, I use an [env-file](https://github.com/isaiah-v/ci-jenkins-agent/blob/master/env-file). Create an env-file and define the required environmental variables.
+ 
+Without Docker Support:
+```
+sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file ci-jenkins-agent:latest
 ```
 
-With Host's Docker Engine:
+With Docker Support:
 ```
-sudo docker run -d --restart=always --name ci-jenkins-agent \
-       -e DIRECT=$DIRECT \
-       -e INSTANCE_IDENTITY=$INSTANCE_IDENTITY \
-       -e SECRET=$SECRET \
-       -e AGENT=$AGENT \
-       -v /var/run/docker.sock:/var/run/docker.sock \
-       -v $(which docker):$(which docker) \
-       ci-jenkins-agent:latest
+sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) ci-jenkins-agent:latest
 ```
