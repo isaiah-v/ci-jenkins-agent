@@ -7,6 +7,16 @@ pipeline {
     }
 
     stages {
+        stage('Build aarch64') {
+            agent { 
+                label 'aarch64'
+            }
+            steps {
+                echo 'Building...'
+                
+                sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()} ."
+            }
+        }
         stage('Build amd64') {
             agent { 
                 label 'amd64'
@@ -14,8 +24,20 @@ pipeline {
             steps {
                 echo 'Building...'
                 
-                sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} ."
-                sh "docker tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
+                sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} ."
+            }
+        }
+        stage('Deploy aarch64') {
+            agent { 
+                label 'aarch64'
+            }
+            when {
+                tag "*"
+            }
+            steps {
+                echo 'Deploying...'
+                
+                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
             }
         }
         stage('Deploy amd64') {
@@ -28,47 +50,13 @@ pipeline {
             steps {
                 echo 'Deploying...'
                 
-                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
-                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
-            }
-        }
-        stage('Clean amd64') {
-            agent { 
-                label 'amd64'
-            }
-            steps {
-                echo 'Cleaning...'
-
-                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
-                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
-            }
-        }
-
-
-        stage('Build aarch64') {
-            agent { 
-                label 'aarch64'
-            }
-            steps {
-                echo 'Building...'
+                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()}"
                 
-                sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()} ."
-                sh "docker tag \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-latest"
-            }
-        }
-        
-        stage('Deploy aarch64') {
-            agent { 
-                label 'aarch64'
-            }
-            when {
-                tag "*"
-            }
-            steps {
-                echo 'Deploying...'
+                sh "docker manifest create --insecure --amend \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
+                sh "docker manifest create --insecure --amend \044DOCKER_REGISTRY/$PROJECT_NAME:latest \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
                 
-                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
-                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-latest"
+                sh "docker manifest push --insecure --purge \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
+                sh "docker manifest push --insecure --purge \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
             }
         }
         stage('Clean aarch64') {
@@ -79,7 +67,16 @@ pipeline {
                 echo 'Cleaning...'
 
                 sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
-                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-latest"
+            }
+        }
+        stage('Clean amd64') {
+            agent { 
+                label 'amd64'
+            }
+            steps {
+                echo 'Cleaning...'
+
+                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()}"
             }
         }
     }
