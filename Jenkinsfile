@@ -18,6 +18,33 @@ pipeline {
                 sh "docker tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
             }
         }
+        stage('Deploy amd64') {
+            agent { 
+                label 'amd64'
+            }
+            when {
+                tag "*"
+            }
+            steps {
+                echo 'Deploying...'
+                
+                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
+                sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
+            }
+        }
+        stage('Clean amd64') {
+            agent { 
+                label 'amd64'
+            }
+            steps {
+                echo 'Cleaning...'
+
+                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
+                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
+            }
+        }
+
+
         stage('Build aarch64') {
             agent { 
                 label 'aarch64'
@@ -29,12 +56,11 @@ pipeline {
                 sh "docker tag \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
             }
         }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
+        
+        stage('Deploy aarch64') {
+            agent { 
+                label 'aarch64'
             }
-        }
-        stage('Deploy') {
             when {
                 tag "*"
             }
@@ -45,7 +71,10 @@ pipeline {
                 sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
             }
         }
-        stage('Clean') {
+        stage('Clean aarch64') {
+            agent { 
+                label 'aarch64'
+            }
             steps {
                 echo 'Cleaning...'
 
