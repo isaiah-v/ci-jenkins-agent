@@ -19,25 +19,13 @@ A jenkins agent setup to connect directly to our Jenkins instance. This setup is
  ```
  
  ## Run
- Basic:
  
+ Without Docker:
  ```
- sudo docker run -d --restart=always --name ci-jenkins-agent \
-       -e DIRECT=$DIRECT \
-       -e INSTANCE_IDENTITY=$INSTANCE_IDENTITY \
-       -e SECRET=$SECRET \
-       -e AGENT=$AGENT \
-       ci-jenkins-agent:latest
+ sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file ci-jenkins-agent:latest
 ```
 
-With Host's Docker Engine:
+With Docker:
 ```
-sudo docker run -d --restart=always --name ci-jenkins-agent \
-       -e DIRECT=$DIRECT \
-       -e INSTANCE_IDENTITY=$INSTANCE_IDENTITY \
-       -e SECRET=$SECRET \
-       -e AGENT=$AGENT \
-       -v /var/run/docker.sock:/var/run/docker.sock \
-       -v $(which docker):$(which docker) \
-       ci-jenkins-agent:latest
+sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) ci-jenkins-agent:latest
 ```
