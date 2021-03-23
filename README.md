@@ -11,23 +11,22 @@ A jenkins agent setup to connect directly to our Jenkins instance. This setup is
  
 `AGENT` - You must provide the agent name. This is easily obtained from the agent status page or other places.
  
-## Build
-```
-git clone https://github.com/isaiah-v/ci-jenkins-agent.git
-cd ci-jenkins-agent
-sudo docker build --tag ci-jenkins-agent:latest .
-```
- 
 ## Run
+
+### 1. Add Node to Jenkins
+In Jenkins, add a new node from the "Manage Nodes and Clouds" settings. 
+
+  - *Remote root directory:* `/var/jenkins_agent/workspace`
+
+### 2. Run Jenkins Agent
+Define your envoirmental variables in an [env-file](https://github.com/isaiah-v/ci-jenkins-agent/blob/master/env-file), and run the container.
  
-In these examples, I use an [env-file](https://github.com/isaiah-v/ci-jenkins-agent/blob/master/env-file). Create an env-file and define the required environmental variables.
- 
-Without Docker Support:
+*Basic Agent*
 ```
-sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file ci-jenkins-agent:latest
+sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file ci.ivcode.org/ci-jenkins-agent:4.7.0.1
 ```
 
-With Docker Support:
+*Agent with Docker Support*
 ```
-sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) ci-jenkins-agent:latest
+sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) ci.ivcode.org/ci-jenkins-agent:4.7.0.1
 ```
