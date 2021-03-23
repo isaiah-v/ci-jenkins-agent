@@ -7,9 +7,9 @@ pipeline {
     }
 
     stages {
-        stage('Build aarch64') {
+        stage('Build Arm64') {
             agent { 
-                label 'aarch64'
+                label 'arm64'
             }
             steps {
                 echo 'Building...'
@@ -17,19 +17,9 @@ pipeline {
                 sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()} ."
             }
         }
-        stage('Build amd64') {
+        stage('Deploy Arm64') {
             agent { 
-                label 'amd64'
-            }
-            steps {
-                echo 'Building...'
-                
-                sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} ."
-            }
-        }
-        stage('Deploy aarch64') {
-            agent { 
-                label 'aarch64'
+                label 'arm64'
             }
             when {
                 tag "*"
@@ -40,7 +30,27 @@ pipeline {
                 sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
             }
         }
-        stage('Deploy amd64') {
+        stage('Clean Arm64') {
+            agent { 
+                label 'arm64'
+            }
+            steps {
+                echo 'Cleaning...'
+
+                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
+            }
+        }
+        stage('Build Amd64') {
+            agent { 
+                label 'amd64'
+            }
+            steps {
+                echo 'Building...'
+                
+                sh "docker build --tag \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} ."
+            }
+        }
+        stage('Deploy Amd64') {
             agent { 
                 label 'amd64'
             }
@@ -51,25 +61,9 @@ pipeline {
                 echo 'Deploying...'
                 
                 sh "docker push \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()}"
-                
-                sh "docker manifest create --insecure --amend \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
-                sh "docker manifest create --insecure --amend \044DOCKER_REGISTRY/$PROJECT_NAME:latest \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
-                
-                sh "docker manifest push --insecure --purge \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
-                sh "docker manifest push --insecure --purge \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
             }
         }
-        stage('Clean aarch64') {
-            agent { 
-                label 'aarch64'
-            }
-            steps {
-                echo 'Cleaning...'
-
-                sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
-            }
-        }
-        stage('Clean amd64') {
+        stage('Clean Amd64') {
             agent { 
                 label 'amd64'
             }
@@ -77,6 +71,23 @@ pipeline {
                 echo 'Cleaning...'
 
                 sh "docker rmi \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()}"
+            }
+        }
+        stage('Update Manifest') {
+            agent { 
+                label 'amd64'
+            }
+            when {
+                tag "*"
+            }
+            steps {
+                echo 'Updating...'
+                
+                sh "docker manifest create --insecure --amend \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
+                sh "docker manifest create --insecure --amend \044DOCKER_REGISTRY/$PROJECT_NAME:latest \044DOCKER_REGISTRY/$PROJECT_NAME:amd64-${getVersion()} \044DOCKER_REGISTRY/$PROJECT_NAME:arm64-${getVersion()}"
+                
+                sh "docker manifest push --insecure --purge \044DOCKER_REGISTRY/$PROJECT_NAME:${getVersion()}"
+                sh "docker manifest push --insecure --purge \044DOCKER_REGISTRY/$PROJECT_NAME:latest"
             }
         }
     }
