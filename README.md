@@ -14,7 +14,7 @@ A jenkins agent setup to connect directly to our Jenkins instance. This setup is
 ## Run
 
 ### 1. Add Node to Jenkins
-In Jenkins, add a new node from the "Manage Nodes and Clouds" settings. 
+In Jenkins, add a new node from the "Manage Nodes and Clouds" settings. While setting up the node, the "Remote root directory" need to be set to the correct location within the container.
 
   - *Remote root directory:* `/var/jenkins_agent/workspace`
 
