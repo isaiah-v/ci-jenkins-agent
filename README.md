@@ -23,10 +23,10 @@ Define your envoirmental variables in an [env-file](https://github.com/isaiah-v/
  
 *Basic Agent*
 ```
-sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file ci.ivcode.org/ci-jenkins-agent:4.7.0.1
+sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file ci.ivcode.org/ci-jenkins-agent:latest
 ```
 
 *Agent with Docker Support*
 ```
-sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) ci.ivcode.org/ci-jenkins-agent:4.7.0.1
+sudo docker run -d --restart=always --name ci-jenkins-agent --env-file env-file -v /var/run/docker.sock:/var/run/docker.sock -v $(which docker):$(which docker) ci.ivcode.org/ci-jenkins-agent:latest
 ```
