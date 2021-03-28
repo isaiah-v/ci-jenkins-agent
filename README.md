@@ -6,6 +6,10 @@ A jenkins agent setup to connect directly to our Jenkins instance. This setup is
 `DIRECT` - You need to specify the host and port, in a typical `HOST:PORT` fashion. The HOST can be whatever name or address resolves to the server. The PORT value can be determined by examining the JNLP file or looking at the Agents section of the server Configure Global Security page.
 
 `INSTANCE_IDENTITY` - Each Jenkins instance has its own [Instance Identity](https://wiki.jenkins.io/display/JENKINS/Instance+Identity). The agent needs this key to complete the connection. You can obtain this value via the script console or the Instance Identity page.
+
+```
+curl -Is  https://${jenkins_path} | grep X-Instance-Identity | awk '{print $2}'
+```
  
 `SECRET` - Your secret key defined in your agent status.
  
